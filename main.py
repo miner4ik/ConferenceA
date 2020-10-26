@@ -3,7 +3,7 @@
 
 import sys
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QIcon, QFont, QPalette, QColor, QPixmap
+from PyQt5.QtGui import QIcon, QFont, QPalette, QColor
 from PyQt5.Qt import QVBoxLayout, QLabel, QDialog, QDialogButtonBox
 from PyQt5.QtCore import Qt, QSize, QPropertyAnimation
 
@@ -29,19 +29,6 @@ class Example(QMainWindow):
 
     def __init__(self):
         super().__init__()
-
-        # Фон-картинка для чата
-        fontChat = QLabel(self)
-        pixmap = QPixmap("fontChat.jpg")
-        fontChat.setPixmap(pixmap)
-        fontChat.resize(500, 500)
-
-        # Фон-картинка для логина
-        fontLog = QLabel(self)
-        pixmap1 = QPixmap("fontLog.jpg")
-        fontLog.setPixmap(pixmap1)
-        fontLog.resize(200, 500)
-        fontLog.move(500, 0)
 
         self.initUI()
 
@@ -149,7 +136,7 @@ class Example(QMainWindow):
 
     # Отправляет сообщение на "Enter"
     def keyPressEvent(self, e):
-        if e.key() == Qt.Key_Return:
+        if e.key() == Qt.Key_Enter:
             if self.btn.isEnabled() == True:
                 self.buttonClicked()
             else:
