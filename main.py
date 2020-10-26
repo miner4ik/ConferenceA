@@ -3,7 +3,7 @@
 
 import sys
 from PyQt5.QtWidgets import *
-from PyQt5.QtGui import QIcon, QFont, QPalette, QColor
+from PyQt5.QtGui import QIcon, QFont, QPalette, QColor, QPixmap
 from PyQt5.Qt import QVBoxLayout, QLabel, QDialog, QDialogButtonBox
 from PyQt5.QtCore import Qt, QSize, QPropertyAnimation
 
@@ -21,7 +21,7 @@ class BeautifulButton(QPushButton):
         self.animation.setStartValue(QColor(Qt.cyan))
         self.animation.setEndValue(QColor(255, 255, 255))
 
-        self.animation.setLoopCount(1)
+        self.animation.setLoopCount(9)
         self.animation.setDuration(5000)
 
 
@@ -29,6 +29,19 @@ class Example(QMainWindow):
 
     def __init__(self):
         super().__init__()
+
+        # Фон-картинка для чата
+        fontChat = QLabel(self)
+        pixmap = QPixmap("fontChat.jpg")
+        fontChat.setPixmap(pixmap)
+        fontChat.resize(500, 500)
+
+        # Фон-картинка для логина
+        fontLog = QLabel(self)
+        pixmap1 = QPixmap("fontLog.jpg")
+        fontLog.setPixmap(pixmap1)
+        fontLog.resize(200, 500)
+        fontLog.move(500, 0)
 
         self.initUI()
 
@@ -66,12 +79,12 @@ class Example(QMainWindow):
         # Кнопка будет неактивна, пока не введем ник
         self.btn.setEnabled(False)
         self.btn.resize(150, 40)
-        self.btn.move(253, 208)
+        self.btn.move(303, 258)
         self.btn.clicked.connect(self.buttonClicked)
 
         # Окно лог с сообщениями
         self.textBrowser = QTextBrowser(self)
-        self.textBrowser.move(0, 20)
+        self.textBrowser.move(50, 70)
         self.textBrowser.resize(255, 190)
 
         # Инициализируем статус бар
@@ -80,13 +93,13 @@ class Example(QMainWindow):
         # Строка для ввода сообщения, сразу предлагает ввести "Hello world"
         self.textEdit = QLineEdit(self)
         self.textEdit.resize(255, 37)
-        self.textEdit.move(0, 210)
+        self.textEdit.move(50, 260)
         self.textEdit.setText("Hello world!")
 
         # Кнопка войти
         self.login = BeautifulButton('Войти', self)
         self.login.resize(102, 30)
-        self.login.move(399, 49)
+        self.login.move(549, 99)
         self.login.clicked.connect(self.loginWindow)
 
         # Размер окна диалога
@@ -98,7 +111,7 @@ class Example(QMainWindow):
         self.le.setReadOnly(True)
         self.le.setStyleSheet("color: blue;")
         self.le.resize(100, 30)
-        self.le.move(400, 20)
+        self.le.move(550, 70)
 
         # Размер основного окна + загрузка иконки
         self.setGeometry(500, 150, 700, 500)
@@ -136,7 +149,7 @@ class Example(QMainWindow):
 
     # Отправляет сообщение на "Enter"
     def keyPressEvent(self, e):
-        if e.key() == Qt.Key_Enter:
+        if e.key() == Qt.Key_Return:
             if self.btn.isEnabled() == True:
                 self.buttonClicked()
             else:
