@@ -87,8 +87,6 @@ class Example(QMainWindow):
         self.btn = BeautifulButton(self)
         self.btn.setIcon(QIcon('image.jpg'))
         self.btn.setIconSize(QSize(150, 150))
-        # Кнопка будет неактивна, пока не введем ник
-        # self.btn.setEnabled(False)
         self.btn.resize(150, 40)
         self.btn.move(303, 258)
         self.btn.clicked.connect(self.buttonClicked)
@@ -107,16 +105,6 @@ class Example(QMainWindow):
         self.textEdit.move(50, 260)
         self.textEdit.setText("")
 
-        # # Кнопка войти
-        # self.login = BeautifulButton('Войти', self)
-        # self.login.resize(102, 30)
-        # self.login.move(549, 99)
-        # self.login.clicked.connect(self.loginWindow)
-
-        # # Размер окна диалога
-        # self.setGeometry(300, 300, 290, 150)
-        # self.setWindowTitle('Input dialog')
-
         # Строка поля ник с синим цветом
         self.le = QLineEdit(self)
         self.le.setStyleSheet("color: blue;")
@@ -129,6 +117,29 @@ class Example(QMainWindow):
         self.setWindowIcon(QIcon('web.png'))
         self.show()
 
+        # toolbar action 1
+        self.test1_action = QAction(QIcon('icons/test1.png'), 'Test 1', self)
+        self.test1_action.triggered.connect(self.show_test1_view)
+
+        # toolbar action 2
+        self.test2_action = QAction(QIcon('icons/test2.png'), 'Test 2', self)
+        self.test2_action.triggered.connect(self.show_test2_view)
+
+        # create toolbar
+        self.toolbar = self.addToolBar('Actions')
+        self.toolbar.addAction(self.test1_action)
+        self.toolbar.addAction(self.test2_action)
+
+    # switch to "test1" view - just a simple label here.
+    def show_test1_view(self):
+        self.test1_view = QLabel('TEST1 VIEW')
+        self.setCentralWidget(self.test1_view)
+
+        # switch to "test2" view - just a simple label here.
+    def show_test2_view(self):
+        self.test2_view = QLabel('TEST2 VIEW')
+        self.setCentralWidget(self.test2_view)
+
     # Функция вызова окна настроек
     def Sett(self):
         s = SettDialog("Тут будут настройки", self)
@@ -140,59 +151,39 @@ class Example(QMainWindow):
         if e.key() == Qt.Key_Escape:
             self.close()
 
-    # Событие на кнопку "Войти" - выводит диалог с полем для ввода ника, и не отпустит, пока не введёшь
-    # def loginWindow(self):
-    #     username = self.QInput.Dialog()
-    #     text, ok = QInputDialog.getText(self, 'Вход', 'Введите ваш ник:')
-    #     while text == "":
-    #         if ok:
-    #             self.statusBar().clearMessage()
-    #         else:
-    #             self.statusBar().clearMessage()
-    #             break
-    #         self.statusBar().showMessage('Вы не ввели ник')
-    #         text, ok = QInputDialog.getText(self, 'Вход', 'Введите ваш ник:')
-    #     self.statusBar().clearMessage()
-    #     if ok:
-    #         # Сделает кнопку отправки сообщения активной
-    #         self.btn.setEnabled(True)
-    #         self.le.setText(str(username))
-
     # Отправляет сообщение на "Enter"
     def keyPressEvent(self, e):
         if e.key() == Qt.Key_Return:
-            if self.btn.isEnabled() == True:
-                self.buttonClicked()
-            else:
-                self.statusBar().showMessage('Вы не залогинились')
+            self.buttonClicked()
 
     # Событие на кнопку "Отправить", припысывает впереди сообщения ник автора
     def buttonClicked(self):
+        username = self.le.text()
+        if username == "":
+            self.statusBar().showMessage('Вы не залогинились')
+            return
 
         if self.textEdit.text() == "":
             self.statusBar().showMessage('Вы ничего не ввели в сообщении')
         else:
             self.statusBar().clearMessage()
             text = self.textEdit.text()
-            username = self.le.text()
-            # Выводим ник с сообщением в лог
-            # self.textBrowser.append(username + " пишет: " + text)
 
             data = {'username': username, 'text': text}
             try:
                 response = requests.post('http://127.0.0.1:5000/send', json=data)
             except:
-                self.textBrowser.append('Сервер недоступен. Порпробуйте позже')
+                self.statusBar().showMessage('Сервер недоступен. Порпробуйте позже')
                 return
 
             if response.status_code != 200:
-                self.textBrowser.append('Неправильные данные')
+                self.statusBar().showMessage('Неправильные данные')
                 return
 
             self.textEdit.setText("")
 
 
-class SettDialog(QDialog):
+class SettDialog(QMainWindow):
 
     def __init__(self, info_str, parent=None):
         super(SettDialog, self).__init__(parent)
