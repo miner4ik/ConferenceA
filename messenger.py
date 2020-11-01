@@ -35,12 +35,14 @@ class Example(QMainWindow):
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.load_messages)
         self.timer.start(1000)
+        self.group ='global'
 
     def load_messages(self):
         try:
             response = requests.get(
-                'http://127.0.0.1:5000/history',
-                params={'after': self.last_msg_time})
+                f'http://127.0.0.1:5000/history/{self.group}',
+                params={'after': self.last_msg_time}
+            )
         except:
             return
 
@@ -105,6 +107,11 @@ class Example(QMainWindow):
         self.textEdit.move(50, 260)
         self.textEdit.setText("")
 
+        self.grl = QLineEdit(self)
+        self.grl.resize(100, 30)
+        self.grl.move(550, 110)
+        self.grl.setText('global')
+
         # Строка поля ник с синим цветом
         self.le = QLineEdit(self)
         self.le.setStyleSheet("color: blue;")
@@ -116,29 +123,6 @@ class Example(QMainWindow):
         self.setWindowTitle('Мессенджер')
         self.setWindowIcon(QIcon('web.png'))
         self.show()
-
-        # toolbar action 1
-        self.test1_action = QAction(QIcon('icons/test1.png'), 'Test 1', self)
-        self.test1_action.triggered.connect(self.show_test1_view)
-
-        # toolbar action 2
-        self.test2_action = QAction(QIcon('icons/test2.png'), 'Test 2', self)
-        self.test2_action.triggered.connect(self.show_test2_view)
-
-        # create toolbar
-        self.toolbar = self.addToolBar('Actions')
-        self.toolbar.addAction(self.test1_action)
-        self.toolbar.addAction(self.test2_action)
-
-    # switch to "test1" view - just a simple label here.
-    def show_test1_view(self):
-        self.test1_view = QLabel('TEST1 VIEW')
-        self.setCentralWidget(self.test1_view)
-
-        # switch to "test2" view - just a simple label here.
-    def show_test2_view(self):
-        self.test2_view = QLabel('TEST2 VIEW')
-        self.setCentralWidget(self.test2_view)
 
     # Функция вызова окна настроек
     def Sett(self):
@@ -159,6 +143,7 @@ class Example(QMainWindow):
     # Событие на кнопку "Отправить", припысывает впереди сообщения ник автора
     def buttonClicked(self):
         username = self.le.text()
+        self.group = self.grl.text()
         if username == "":
             self.statusBar().showMessage('Вы не залогинились')
             return
@@ -171,7 +156,7 @@ class Example(QMainWindow):
 
             data = {'username': username, 'text': text}
             try:
-                response = requests.post('http://127.0.0.1:5000/send', json=data)
+                response = requests.post(f'http://127.0.0.1:5000/send/{self.group}', json=data)
             except:
                 self.statusBar().showMessage('Сервер недоступен. Порпробуйте позже')
                 return
