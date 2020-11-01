@@ -2,14 +2,12 @@ import time
 from flask import Flask, request, Response
 
 app = Flask(__name__)
-messages = []
-users = []
+all_data = {'global': []}
 
 
 @app.route('/')
 def index():
     return 'Hello'
-
 
 @app.route("/status")
 def status():
@@ -19,8 +17,9 @@ def status():
 
     }
 
-@app.route("/history")
-def history():
+
+@app.route("/history/<group>")
+def history(group):
     """
         request: after
         response: {
@@ -30,6 +29,12 @@ def history():
             ]
         }
         """
+    try:
+        all_data[group]
+    except KeyError:
+        all_data[group] = []
+
+    messages = all_data[group]
     after = (float(request.args['after']))
     filtered_msg = []
     for message in messages:
@@ -38,13 +43,20 @@ def history():
     return {"messages": filtered_msg}
 
 
-@app.route("/send", methods=['POST'])
-def send():
+@app.route("/send/<group>", methods=['POST'])
+def send(group):
     data = request.json  # JSON -> dict
     username = data['username']
     text = data['text']
+    try:
+        all_data[group]
+    except KeyError:
+        all_data[group] = []
+    messages = all_data[group]
     messages.append({'username': username, 'text': text, 'time': time.time()})
+
     return Response(status=200)
+
 
 
 app.run()
