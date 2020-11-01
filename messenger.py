@@ -107,11 +107,18 @@ class Example(QMainWindow):
         self.textEdit.move(50, 260)
         self.textEdit.setText("")
 
+        # Строка с ключевым словом
         self.grl = QLineEdit(self)
         self.grl.resize(100, 30)
         self.grl.move(550, 110)
         self.grl.setText('global')
 
+        # Кнопка "Переход" на другой сервер(перерисовка окна лога)
+        self.btnRepaint = BeautifulButton('Переход', self)
+        self.btnRepaint.resize(100, 30)
+        self.btnRepaint.move(550, 160)
+        self.btnRepaint.clicked.connect(self.RepaintLog)
+        
         # Строка поля ник с синим цветом
         self.le = QLineEdit(self)
         self.le.setStyleSheet("color: blue;")
@@ -124,6 +131,10 @@ class Example(QMainWindow):
         self.setWindowIcon(QIcon('web.png'))
         self.show()
 
+    # Функция на кнопку "Переход"
+    def RepaintLog(self):
+        self.textBrowser.repaint()
+        
     # Функция вызова окна настроек
     def Sett(self):
         s = SettDialog("Тут будут настройки", self)
