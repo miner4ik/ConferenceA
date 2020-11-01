@@ -1,11 +1,11 @@
-#!/usr/bin/python3
-# -*- coding: utf-8 -*-
-
 import sys
+from PyQt5 import QtCore
 from PyQt5.QtWidgets import *
 from PyQt5.QtGui import QIcon, QFont, QPalette, QColor
-from PyQt5.Qt import QVBoxLayout, QLabel, QDialog, QDialogButtonBox
+from PyQt5.Qt import QVBoxLayout, QLabel, QDialog, QDialogButtonBox, QThread, pyqtSignal
 from PyQt5.QtCore import Qt, QSize, QPropertyAnimation
+import requests
+from datetime import datetime
 
 appearance = ''
 
@@ -31,6 +31,30 @@ class Example(QMainWindow):
         super().__init__()
 
         self.initUI()
+        self.last_msg_time = 0
+        self.timer = QtCore.QTimer()
+        self.timer.timeout.connect(self.load_messages)
+        self.timer.start(1000)
+
+    def load_messages(self):
+        try:
+            response = requests.get(
+                'http://127.0.0.1:5000/history',
+                params={'after': self.last_msg_time})
+        except:
+            return
+
+        data = response.json()
+        for message in data['messages']:
+            beauty_time = datetime.fromtimestamp(message['time'])
+            beauty_time = beauty_time.strftime('%d/%m/%Y %H:%M:%S')
+            self.textBrowser.append(beauty_time + ' ' + message['username'])
+            self.textBrowser.repaint()
+            self.textBrowser.append(message['text'])
+            self.textBrowser.repaint()
+            self.textBrowser.append('')
+            self.textBrowser.repaint()
+            self.last_msg_time = message['time']
 
     def initUI(self):
         QToolTip.setFont(QFont('SansSerif', 10))
@@ -63,8 +87,6 @@ class Example(QMainWindow):
         self.btn = BeautifulButton(self)
         self.btn.setIcon(QIcon('image.jpg'))
         self.btn.setIconSize(QSize(150, 150))
-        # Кнопка будет неактивна, пока не введем ник
-        self.btn.setEnabled(False)
         self.btn.resize(150, 40)
         self.btn.move(303, 258)
         self.btn.clicked.connect(self.buttonClicked)
@@ -77,25 +99,14 @@ class Example(QMainWindow):
         # Инициализируем статус бар
         self.statusBar()
 
-        # Строка для ввода сообщения, сразу предлагает ввести "Hello world"
+        # Строка для ввода сообщения
         self.textEdit = QLineEdit(self)
         self.textEdit.resize(255, 37)
         self.textEdit.move(50, 260)
-        self.textEdit.setText("Hello world!")
-
-        # Кнопка войти
-        self.login = BeautifulButton('Войти', self)
-        self.login.resize(102, 30)
-        self.login.move(549, 99)
-        self.login.clicked.connect(self.loginWindow)
-
-        # Размер окна диалога
-        self.setGeometry(300, 300, 290, 150)
-        self.setWindowTitle('Input dialog')
+        self.textEdit.setText("")
 
         # Строка поля ник с синим цветом
         self.le = QLineEdit(self)
-        self.le.setReadOnly(True)
         self.le.setStyleSheet("color: blue;")
         self.le.resize(100, 30)
         self.le.move(550, 70)
@@ -117,41 +128,35 @@ class Example(QMainWindow):
         if e.key() == Qt.Key_Escape:
             self.close()
 
-    # Событие на кнопку "Войти" - выводит диалог с полем для ввода ника, и не отпустит, пока не введёшь
-    def loginWindow(self):
-        text, ok = QInputDialog.getText(self, 'Вход', 'Введите ваш ник:')
-        while text == "":
-            if ok:
-                self.statusBar().clearMessage()
-            else:
-                self.statusBar().clearMessage()
-                break
-            self.statusBar().showMessage('Вы не ввели ник')
-            text, ok = QInputDialog.getText(self, 'Вход', 'Введите ваш ник:')
-        self.statusBar().clearMessage()
-        if ok:
-            # Сделает кнопку отправки сообщения активной
-            self.btn.setEnabled(True)
-            self.le.setText(str(text))
-
     # Отправляет сообщение на "Enter"
     def keyPressEvent(self, e):
-        if e.key() == Qt.Key_Enter:
-            if self.btn.isEnabled() == True:
-                self.buttonClicked()
-            else:
-                self.statusBar().showMessage('Вы не залогинились')
+        if e.key() == Qt.Key_Return:
+            self.buttonClicked()
 
     # Событие на кнопку "Отправить", припысывает впереди сообщения ник автора
     def buttonClicked(self):
+        username = self.le.text()
+        if username == "":
+            self.statusBar().showMessage('Вы не залогинились')
+            return
+
         if self.textEdit.text() == "":
             self.statusBar().showMessage('Вы ничего не ввели в сообщении')
         else:
             self.statusBar().clearMessage()
-            textboxValue = self.textEdit.text()
-            loginBar = self.le.text()
-            # Выводим ник с сообщением в лог
-            self.textBrowser.append(loginBar + " пишет: " + textboxValue)
+            text = self.textEdit.text()
+
+            data = {'username': username, 'text': text}
+            try:
+                response = requests.post('http://127.0.0.1:5000/send', json=data)
+            except:
+                self.statusBar().showMessage('Сервер недоступен. Порпробуйте позже')
+                return
+
+            if response.status_code != 200:
+                self.statusBar().showMessage('Неправильные данные')
+                return
+
             self.textEdit.setText("")
 
 
