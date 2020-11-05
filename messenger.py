@@ -1,3 +1,4 @@
+import operator
 import sys
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import *
@@ -35,19 +36,24 @@ class Example(QMainWindow):
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.load_messages)
         self.timer.start(1000)
-        self.group ='global'
+        self.group = 'global'
 
-    def load_messages(self):
+    def load_messages(self, is_first_in_group=None):
         try:
             response = requests.get(
-                f'http://127.0.0.1:5000/history/{self.group}',
-                params={'after': self.last_msg_time}
+                f'http://derty.pythonanywhere.com//history/{self.group}',
+                params={'after': self.last_msg_time if not is_first_in_group else 0}
             )
         except:
             return
 
         data = response.json()
+        messages = []
         for message in data['messages']:
+            messages.append(message)
+
+        messages.sort(key=lambda i: i['time'])
+        for message in messages:
             beauty_time = datetime.fromtimestamp(message['time'])
             beauty_time = beauty_time.strftime('%d/%m/%Y %H:%M:%S')
             self.textBrowser.append(beauty_time + ' ' + message['username'])
@@ -57,6 +63,7 @@ class Example(QMainWindow):
             self.textBrowser.append('')
             self.textBrowser.repaint()
             self.last_msg_time = message['time']
+
 
     def initUI(self):
         QToolTip.setFont(QFont('SansSerif', 10))
@@ -118,7 +125,7 @@ class Example(QMainWindow):
         self.btnRepaint.resize(100, 30)
         self.btnRepaint.move(550, 160)
         self.btnRepaint.clicked.connect(self.RepaintLog)
-        
+
         # Строка поля ник с синим цветом
         self.le = QLineEdit(self)
         self.le.setStyleSheet("color: blue;")
@@ -133,8 +140,12 @@ class Example(QMainWindow):
 
     # Функция на кнопку "Переход"
     def RepaintLog(self):
-        self.textBrowser.repaint()
-        
+        self.textBrowser.clear()
+        self.group = self.grl.text()
+        self.load_messages(is_first_in_group=True)
+
+
+
     # Функция вызова окна настроек
     def Sett(self):
         s = SettDialog("Тут будут настройки", self)
@@ -167,7 +178,7 @@ class Example(QMainWindow):
 
             data = {'username': username, 'text': text}
             try:
-                response = requests.post(f'http://127.0.0.1:5000/send/{self.group}', json=data)
+                response = requests.post(f'http://derty.pythonanywhere.com/send/{self.group}', json=data)
             except:
                 self.statusBar().showMessage('Сервер недоступен. Порпробуйте позже')
                 return
