@@ -58,5 +58,5 @@ def send(group):
     return Response(status=200)
 
 
-
-app.run()
+if __name__ == '__main__':
+    app.run()
