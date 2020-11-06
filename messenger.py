@@ -92,15 +92,15 @@ class Example(QMainWindow):
         # Кнопка "Отправить", для отправки сообщения в лог
         self.btn = BeautifulButton(self)
         self.btn.setIcon(QIcon('send.png'))
-        self.btn.setIconSize(QSize(40, 39))
-        self.btn.resize(40, 39)
-        self.btn.move(230, 398)
+        self.btn.setIconSize(QSize(41, 40))
+        self.btn.resize(41, 40)
+        self.btn.move(210, 388)
         self.btn.clicked.connect(self.buttonClicked)
 
         # Окно лог с сообщениями
         self.textBrowser = QTextBrowser(self)
-        self.textBrowser.move(50, 30)
-        self.textBrowser.resize(220, 370)
+        self.textBrowser.move(0, 20)
+        self.textBrowser.resize(250, 370)
 
         # Инициализируем статус бар
         self.statusBar()
@@ -116,8 +116,8 @@ class Example(QMainWindow):
 
         # Строка для ввода сообщения
         self.textEdit = QLineEdit(self)
-        self.textEdit.resize(180, 37)
-        self.textEdit.move(50, 400)
+        self.textEdit.resize(212, 37)
+        self.textEdit.move(0, 390)
 
         # Строка с ключевым словом
         self.grl = QLineEdit(self)
