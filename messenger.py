@@ -127,8 +127,8 @@ class Example(QMainWindow):
 
         # Кнопка "Переход" на другой сервер(перерисовка окна лога)
         self.btnRepaint = BeautifulButton('Переход', self)
-        self.btnRepaint.resize(100, 30)
-        self.btnRepaint.move(280, 110)
+        self.btnRepaint.resize(102, 30)
+        self.btnRepaint.move(279, 110)
         self.btnRepaint.clicked.connect(self.RepaintLog)
 
         # Строка поля ник с синим цветом
@@ -138,7 +138,7 @@ class Example(QMainWindow):
         self.le.move(280, 30)
 
         # Размер основного окна + загрузка иконки
-        self.setGeometry(500, 150, 700, 500)
+        self.setGeometry(500, 150, 385, 427)
         self.setWindowTitle('Мессенджер')
         self.setWindowIcon(QIcon('web.png'))
         self.show()
