@@ -1,4 +1,4 @@
-import operator
+import json
 import sys
 from PyQt5 import QtCore
 from PyQt5.QtWidgets import *
@@ -65,6 +65,7 @@ class Example(QMainWindow):
         QToolTip.setFont(QFont('SansSerif', 10))
 
         global appearance
+
         # Фон окна
         appearance = self.palette()
         appearance.setColor(QPalette.Normal, QPalette.Window, QColor("white"))
@@ -90,43 +91,50 @@ class Example(QMainWindow):
 
         # Кнопка "Отправить", для отправки сообщения в лог
         self.btn = BeautifulButton(self)
-        self.btn.setIcon(QIcon('image.jpg'))
-        self.btn.setIconSize(QSize(150, 150))
-        self.btn.resize(150, 40)
-        self.btn.move(303, 258)
+        self.btn.setIcon(QIcon('image.png'))
+        self.btn.setIconSize(QSize(40, 39))
+        self.btn.resize(40, 39)
+        self.btn.move(230, 398)
         self.btn.clicked.connect(self.buttonClicked)
 
         # Окно лог с сообщениями
         self.textBrowser = QTextBrowser(self)
-        self.textBrowser.move(50, 70)
-        self.textBrowser.resize(255, 190)
+        self.textBrowser.move(50, 30)
+        self.textBrowser.resize(220, 370)
 
         # Инициализируем статус бар
         self.statusBar()
 
-        # Строка для ввода сообщения, сразу предлагает ввести "Hello world"
+        # Выпадающий список
+        self.combo = QComboBox(self)
+        with open('channel_list.json', 'r') as f:
+            self.lst = json.load(f)
+        self.combo.addItems(self.lst)
+        self.combo.move(280, 150)
+        self.combo.activated[str].connect(self.onActivated)
+
+        # Строка для ввода сообщения
         self.textEdit = QLineEdit(self)
-        self.textEdit.resize(255, 37)
-        self.textEdit.move(50, 260)
-        self.textEdit.setText("")
+        self.textEdit.resize(180, 37)
+        self.textEdit.move(50, 400)
 
         # Строка с ключевым словом
         self.grl = QLineEdit(self)
         self.grl.resize(100, 30)
-        self.grl.move(550, 110)
+        self.grl.move(280, 70)
         self.grl.setText('global')
 
         # Кнопка "Переход" на другой сервер(перерисовка окна лога)
         self.btnRepaint = BeautifulButton('Переход', self)
         self.btnRepaint.resize(100, 30)
-        self.btnRepaint.move(550, 160)
+        self.btnRepaint.move(280, 110)
         self.btnRepaint.clicked.connect(self.RepaintLog)
 
         # Строка поля ник с синим цветом
         self.le = QLineEdit(self)
-        self.le.setStyleSheet("color: blue;")
+        self.le.setStyleSheet("color: red;")
         self.le.resize(100, 30)
-        self.le.move(550, 70)
+        self.le.move(280, 30)
 
         # Размер основного окна + загрузка иконки
         self.setGeometry(500, 150, 700, 500)
@@ -134,11 +142,23 @@ class Example(QMainWindow):
         self.setWindowIcon(QIcon('web.png'))
         self.show()
 
+    # Функция при выборе комнаты в списке
+    def onActivated(self, text):
+        self.grl.setText(text)
+
     # Функция на кнопку "Переход"
     def RepaintLog(self):
         self.textBrowser.clear()
         self.group = self.grl.text()
         self.load_messages(is_first_in_group=True)
+        if self.grl.text() in self.lst:
+            return
+        self.lst.append(self.grl.text())
+        with open('channel_list.json', 'w') as fh:  # открываем файл на запись
+            fh.write(json.dumps(self.lst, ensure_ascii=False))
+        print(self.lst)
+        self.combo.clear()
+        self.combo.addItems(self.lst)
 
     # Функция вызова окна настроек
     def Sett(self):
