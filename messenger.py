@@ -56,14 +56,10 @@ class Example(QMainWindow):
         for message in messages:
             beauty_time = datetime.fromtimestamp(message['time'])
             beauty_time = beauty_time.strftime('%d/%m/%Y %H:%M:%S')
-            self.textBrowser.append(beauty_time + ' ' + message['username'])
-            self.textBrowser.repaint()
+            self.textBrowser.append(beauty_time + ' ' + f"<FONT COLOR=RED>{message['username']}</FONT>")
             self.textBrowser.append(message['text'])
-            self.textBrowser.repaint()
             self.textBrowser.append('')
-            self.textBrowser.repaint()
             self.last_msg_time = message['time']
-
 
     def initUI(self):
         QToolTip.setFont(QFont('SansSerif', 10))
@@ -144,8 +140,6 @@ class Example(QMainWindow):
         self.group = self.grl.text()
         self.load_messages(is_first_in_group=True)
 
-
-
     # Функция вызова окна настроек
     def Sett(self):
         s = SettDialog("Тут будут настройки", self)
@@ -190,7 +184,7 @@ class Example(QMainWindow):
             self.textEdit.setText("")
 
 
-class SettDialog(QMainWindow):
+class SettDialog(QDialog):
 
     def __init__(self, info_str, parent=None):
         super(SettDialog, self).__init__(parent)
@@ -201,10 +195,7 @@ class SettDialog(QMainWindow):
         self.font = QCheckBox('Серый фон')
         self.font.stateChanged.connect(self.changeFont)
 
-        self.findButton = QPushButton(self.tr("&Find"))
-        self.findButton.clicked.connect(self.findClick)
         self.buttons = QDialogButtonBox(QDialogButtonBox.Ok, Qt.Horizontal, self)
-        self.buttons.addButton(self.findButton, QDialogButtonBox.ActionRole)
         self.buttons.accepted.connect(self.accept)
 
         layout.addWidget(self.label)
@@ -224,9 +215,6 @@ class SettDialog(QMainWindow):
             self.font.setStyleSheet("color: black;")
             appearance.setColor(QPalette.Normal, QPalette.Window, QColor("white"))
             self.setPalette(appearance)
-
-    def findClick(self):
-        print('Clicked!')
 
 
 if __name__ == '__main__':
