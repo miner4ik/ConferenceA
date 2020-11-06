@@ -91,7 +91,7 @@ class Example(QMainWindow):
 
         # Кнопка "Отправить", для отправки сообщения в лог
         self.btn = BeautifulButton(self)
-        self.btn.setIcon(QIcon('image.png'))
+        self.btn.setIcon(QIcon('send.png'))
         self.btn.setIconSize(QSize(40, 39))
         self.btn.resize(40, 39)
         self.btn.move(230, 398)
@@ -112,6 +112,7 @@ class Example(QMainWindow):
         self.combo.addItems(self.lst)
         self.combo.move(280, 150)
         self.combo.activated[str].connect(self.onActivated)
+        self.combo.activated[str].connect(self.RepaintLog)
 
         # Строка для ввода сообщения
         self.textEdit = QLineEdit(self)
@@ -156,7 +157,6 @@ class Example(QMainWindow):
         self.lst.append(self.grl.text())
         with open('channel_list.json', 'w') as fh:  # открываем файл на запись
             fh.write(json.dumps(self.lst, ensure_ascii=False))
-        print(self.lst)
         self.combo.clear()
         self.combo.addItems(self.lst)
 
