@@ -122,13 +122,13 @@ class Example(QMainWindow):
         # Строка с ключевым словом
         self.grl = QLineEdit(self)
         self.grl.resize(100, 30)
-        self.grl.move(280, 88)
+        self.grl.move(280, 118)
         self.grl.setText('global')
 
         # Кнопка "Переход" на другой сервер(перерисовка окна лога)
         self.btnRepaint = BeautifulButton('Переход', self)
         self.btnRepaint.resize(102, 30)
-        self.btnRepaint.move(279, 120)
+        self.btnRepaint.move(279, 150)
         self.btnRepaint.clicked.connect(self.RepaintLog)
 
         # Строка поля ник с синим цветом
@@ -140,6 +140,10 @@ class Example(QMainWindow):
         # Подпись "Ваш ник"
         self.nik = QLabel("Ваш ник:", self)
         self.nik.move(280, 30)
+
+        # Подпись "Сервер"
+        self.nik = QLabel("Сервер:", self)
+        self.nik.move(280, 90)
 
         # Размер основного окна + загрузка иконки
         self.setGeometry(500, 150, 385, 427)
