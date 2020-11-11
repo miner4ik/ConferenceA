@@ -143,7 +143,7 @@ class Example(QMainWindow):
 
         # Подпись "Сервер"
         self.nik = QLabel("Сервер:", self)
-        self.nik.move(280, 90)
+        self.nik.move(280, 93)
 
         # Размер основного окна + загрузка иконки
         self.setGeometry(500, 150, 385, 427)
