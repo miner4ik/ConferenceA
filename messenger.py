@@ -110,7 +110,7 @@ class Example(QMainWindow):
         with open('channel_list.json', 'r') as f:
             self.lst = json.load(f)
         self.combo.addItems(self.lst)
-        self.combo.move(280, 150)
+        self.combo.move(280, 190)
         self.combo.activated[str].connect(self.onActivated)
         self.combo.activated[str].connect(self.RepaintLog)
 
@@ -122,20 +122,24 @@ class Example(QMainWindow):
         # Строка с ключевым словом
         self.grl = QLineEdit(self)
         self.grl.resize(100, 30)
-        self.grl.move(280, 70)
+        self.grl.move(280, 88)
         self.grl.setText('global')
 
         # Кнопка "Переход" на другой сервер(перерисовка окна лога)
         self.btnRepaint = BeautifulButton('Переход', self)
         self.btnRepaint.resize(102, 30)
-        self.btnRepaint.move(279, 110)
+        self.btnRepaint.move(279, 120)
         self.btnRepaint.clicked.connect(self.RepaintLog)
 
         # Строка поля ник с синим цветом
         self.le = QLineEdit(self)
         self.le.setStyleSheet("color: red;")
         self.le.resize(100, 30)
-        self.le.move(280, 30)
+        self.le.move(280, 55)
+
+        # Подпись "Ваш ник"
+        self.nik = QLabel("Ваш ник:", self)
+        self.nik.move(280, 30)
 
         # Размер основного окна + загрузка иконки
         self.setGeometry(500, 150, 385, 427)
