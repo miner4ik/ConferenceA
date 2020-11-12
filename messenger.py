@@ -105,14 +105,15 @@ class Example(QMainWindow):
         # Инициализируем статус бар
         self.statusBar()
 
-        # Выпадающий список
-        self.combo = QComboBox(self)
+        # Список серверов
+        self.listBut = QListWidget(self)
         with open('channel_list.json', 'r') as f:
             self.lst = json.load(f)
-        self.combo.addItems(self.lst)
-        self.combo.move(280, 190)
-        self.combo.activated[str].connect(self.onActivated)
-        self.combo.activated[str].connect(self.RepaintLog)
+        self.listBut.addItems(self.lst)
+        self.listBut.move(280, 230)
+        self.listBut.itemClicked.connect(self.onActivated)
+        self.listBut.itemClicked.connect(self.RepaintLog)
+        self.listBut.itemDoubleClicked.connect(self.delServer)
 
         # Строка для ввода сообщения
         self.textEdit = QLineEdit(self)
@@ -152,8 +153,22 @@ class Example(QMainWindow):
         self.show()
 
     # Функция при выборе комнаты в списке
-    def onActivated(self, text):
-        self.grl.setText(text)
+    def onActivated(self, item):
+        self.grl.setText(item.text())
+
+    # Дабл клик удаляет сервер
+    def delServer(self):
+        listItems = self.listBut.selectedItems()
+        if not listItems:
+            return
+        for item in listItems:
+            self.listBut.takeItem(self.listBut.row(item))
+        if self.grl.text() in self.lst:
+            self.lst.remove(self.grl.text())
+        self.grl.clear()
+        self.textBrowser.clear()
+        with open('channel_list.json', 'w') as fh:  # открываем файл на запись
+            fh.write(json.dumps(self.lst, ensure_ascii=False))
 
     # Функция на кнопку "Переход"
     def RepaintLog(self):
@@ -165,8 +180,8 @@ class Example(QMainWindow):
         self.lst.append(self.grl.text())
         with open('channel_list.json', 'w') as fh:  # открываем файл на запись
             fh.write(json.dumps(self.lst, ensure_ascii=False))
-        self.combo.clear()
-        self.combo.addItems(self.lst)
+        self.listBut.clear()
+        self.listBut.addItems(self.lst)
 
     # Функция вызова окна настроек
     def Sett(self):
